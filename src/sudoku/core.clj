@@ -1,4 +1,6 @@
 (ns sudoku.core
+  "Core data structures and functions for representing, manipulating, and
+  solving sudoku puzzles"
   (:require [clojure.math.combinatorics :refer [combinations]]
             [clojure.set :refer [union difference]]
             [clojure.spec.alpha :as s]
@@ -113,6 +115,7 @@
     (reduce
       (fn [sg cell]
         (cond
+          ; if cell is not in the containment, remove contained value(s) from it
           (not (contains? con-cells cell)) (update sg cell difference con-vals)
           ; special case: if value is contained to a single cell, narrow cell's scope to one
           (= con-cells #{cell}) (assoc sg cell con-vals)
@@ -125,10 +128,12 @@
   therefore are eligible to have their scopes narrowed by it"
   [containment]
   (let [[_ con-cells] containment
-        groups (mapcat (comp vals get-groups-of-cell) con-cells)
-        freqs (-> (group-by first groups)
-                  (update-vals #(into #{} (map second %))))]
-    (->> freqs
+        relevant-groups (mapcat (comp vals get-groups-of-cell) con-cells)
+        relevant-groups-by-type (-> (group-by first relevant-groups)
+                                    (update-vals #(into #{} (map second %))))]
+    (->> relevant-groups-by-type
+         ; Keep only where number of groups of the type = 1, i.e. containment
+         ; is completely within that group.
          (filter (comp (partial = 1) count val))
          (map #(vector (first %) (first (second %)))))))
 

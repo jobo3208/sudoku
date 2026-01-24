@@ -1,4 +1,5 @@
-(ns sudoku.draw)
+(ns sudoku.draw
+  "Functions for rendering puzzles as strings")
 
 (def ^:dynamic *draw-size* ::big)
 

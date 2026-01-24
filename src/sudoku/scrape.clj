@@ -1,8 +1,7 @@
 (ns sudoku.scrape
+  "Functions for scraping puzzles from the web"
   (:require [clojure.string :as string]
             [sudoku.core :as core]))
-
-; NOTE: websudoku doesn't like scraping, so you probably shouldn't use this code.
 
 (defn parse-page [html-str]
   (let [[_ level set-id] (re-find #"level=(\d)&set_id=(\d+)" html-str)
@@ -23,20 +22,13 @@
        (throw (ex-info "IP blocked!" {}))
        (parse-page html-str)))))
 
+; NOTE: websudoku doesn't like scraping, so you probably shouldn't use this function.
 (defn scrape-and-solve-forever [level]
   (let [puzzle (scrape-puzzle level)
-        sg (core/puzzle->scope-grid puzzle)
-        t-start (System/currentTimeMillis)
-        sg' (try
-              (core/solve sg)
-              (catch Exception e sg))
-        t-end (System/currentTimeMillis)
-        duration (/ (float (- t-end t-start)) 1000)
-        result {:level level
-                :set-id (:set-id (meta puzzle))
-                :duration duration
-                :done? (core/done? sg')
-                :solved? (core/solved? (core/scope-grid->puzzle sg'))}]
+        result (core/solve-puzzle puzzle)
+        result (-> result
+                   (assoc :level level :set-id (:set-id (meta puzzle)))
+                   (dissoc :solution))]
     (println result)
     (Thread/sleep 30000)
     (recur level)))

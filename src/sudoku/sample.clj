@@ -1,4 +1,5 @@
-(ns sudoku.sample)
+(ns sudoku.sample
+  "Sample puzzles")
 
 (def easy-puzzle
   ^{:url "https://www.websudoku.com/?level=1&set_id=2856367253"}
