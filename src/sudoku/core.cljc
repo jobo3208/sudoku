@@ -3,9 +3,7 @@
   solving sudoku puzzles"
   (:require [clojure.math.combinatorics :refer [combinations]]
             [clojure.set :refer [union difference]]
-            [clojure.spec.alpha :as s]
-            [sudoku.draw :refer [drawp]]
-            [sudoku.read :refer [string->puzzle]]))
+            [clojure.spec.alpha :as s]))
 
 ; specs as documentation
 (s/def ::grid (s/coll-of any? :kind vector? :count 81))
@@ -185,22 +183,10 @@
   "Solve puzzle, returning a map of information about the solution process"
   [puzzle]
   (let [sg (puzzle->scope-grid puzzle)
-        t-start (System/currentTimeMillis)
         sg' (try
               (solve sg)
-              (catch Exception e sg))
-        t-end (System/currentTimeMillis)
-        duration (/ (float (- t-end t-start)) 1000)
+              (catch Exception _ sg))
         puzzle' (scope-grid->puzzle sg')]
-    {:duration duration
-     :solution puzzle'
+    {:solution puzzle'
      :done? (done? sg')
      :solved? (solved? puzzle')}))
-
-(defn -main [puzzle-str]
-  (let [puzzle (string->puzzle puzzle-str)
-        result (solve-puzzle puzzle)]
-    (drawp (:solution result))
-    (println "Done:     " (:done? result))
-    (println "Solved:   " (:solved? result))
-    (println "Duration: " (:duration result))))

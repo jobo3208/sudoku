@@ -3,4 +3,4 @@
         org.clojure/math.combinatorics {:mvn/version "0.1.6"}}
  :aliases
  {:scrape {:main-opts ["-m" "sudoku.scrape" "4"]}
-  :solve {:main-opts ["-m" "sudoku.core"]}}}
+  :solve {:main-opts ["-m" "sudoku.cli"]}}}
